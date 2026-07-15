@@ -2,19 +2,38 @@ import requests
 from bs4 import BeautifulSoup
 
 # acessa o site
-site = "https://quotes.toscrape.com/"
+URL = "https://quotes.toscrape.com/"
 
 # faz a requisição para o site
-response = requests.get(site)
+def obter_html(url):
 
-# cria o objeto BeautifulSoup
-soup = BeautifulSoup(response.text, 'html.parser')
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()  # levanta um erro se a requisição falhar
+    return response
 
-# encontra todas as citações na página
-todas_as_citacoes = soup.find_all('span', itemprop='text')
+def extrair_citacoes(html):
 
-# imprime todas as citações
-for citacao in todas_as_citacoes:
-    print(citacao.get_text())
+    soup = BeautifulSoup(html, 'html.parser')
+
+    citacoes = []
+
+    for quote in soup.find_all('div', class_='quote'):
+        
+        texto = quote.find('span', class_='text').get_text()
+        autor = quote.find('small', class_='author').get_text()
+        citacoes.append({'texto': texto, 'autor': autor})
+
+    return citacoes
+
+def main():
+
+    html = obter_html(URL).text
+    citacoes = extrair_citacoes(html)
+
+    for c in citacoes:
+        print(f"{c['texto']} - {c['autor']}")
+    
+if __name__ == "__main__":
+    main()
  
 
