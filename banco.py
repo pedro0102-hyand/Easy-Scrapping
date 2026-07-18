@@ -5,6 +5,7 @@ from config import DATABASE, NOME_TABELA
 def salvar_csv(citacoes, nome_arquivo="citacoes.csv"):
 
     citacoes_formatadas = []
+    
     for citacao in citacoes:
 
         copia = citacao.copy()
@@ -33,7 +34,10 @@ def criar_tabela():
             link_autor TEXT,
             data_nascimento TEXT,
             local_nascimento TEXT,
-            biografia TEXT
+            biografia TEXT,
+            coletado_em TEXT,
+            url_origem TEXT,
+            hash_texto TEXT
         )
     """)
 
@@ -43,7 +47,10 @@ def criar_tabela():
     novas_colunas = {
         "data_nascimento": "TEXT",
         "local_nascimento": "TEXT",
-        "biografia": "TEXT"
+        "biografia": "TEXT",
+        "coletado_em": "TEXT",
+        "url_origem": "TEXT",
+        "hash_texto": "TEXT"
     }
 
     for nome_coluna, tipo_coluna in novas_colunas.items():
@@ -86,15 +93,21 @@ def salvar_citacoes(citacoes):
                 link_autor,
                 data_nascimento,
                 local_nascimento,
-                biografia
+                biografia,
+                coletado_em,
+                url_origem,
+                hash_texto
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (texto, autor) DO UPDATE SET
                 tags = excluded.tags,
                 link_autor = excluded.link_autor,
                 data_nascimento = excluded.data_nascimento,
                 local_nascimento = excluded.local_nascimento,
-                biografia = excluded.biografia
+                biografia = excluded.biografia,
+                coletado_em = excluded.coletado_em,
+                url_origem = excluded.url_origem,
+                hash_texto = excluded.hash_texto
         """, (
             citacao["texto"],
             citacao["autor"],
@@ -102,7 +115,10 @@ def salvar_citacoes(citacoes):
             citacao["link_autor"],
             citacao.get("data_nascimento"),
             citacao.get("local_nascimento"),
-            citacao.get("biografia")
+            citacao.get("biografia"),
+            citacao.get("coletado_em"),
+            citacao.get("url_origem"),
+            citacao.get("hash_texto")
         ))
 
     conn.commit()

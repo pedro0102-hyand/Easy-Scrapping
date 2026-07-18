@@ -14,7 +14,7 @@ def main():
     while url_atual is not None:
         print(f"Coletando: {url_atual}")
         html = obter_html(url_atual)
-        citacoes = extrair_citacoes(html)
+        citacoes = extrair_citacoes(html, url_origem=url_atual)
         todas_as_citacoes.extend(citacoes)
         url_atual = obter_proxima_pagina(html)
 

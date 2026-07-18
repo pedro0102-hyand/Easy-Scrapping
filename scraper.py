@@ -1,5 +1,7 @@
+import hashlib
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 from config import URL
 
@@ -10,10 +12,19 @@ def obter_html(url):
     return response.text
 
 
-def extrair_citacoes(html):
+def gerar_hash_texto(texto):
+
+    # Identificador estável da citação, útil para deduplicação e rastreio.
+    return hashlib.sha256(texto.encode("utf-8")).hexdigest()
+
+
+def extrair_citacoes(html, url_origem=None):
 
     soup = BeautifulSoup(html, "html.parser") # cria o objeto BeautifulSoup para fazer o parsing do HTML
     citacoes = [] # lista para armazenar as citações extraídas
+
+    # momento da coleta em UTC, igual para todas as citações desta página
+    coletado_em = datetime.now(timezone.utc).isoformat()
 
     # percorre todas as divs com a classe "quote" e extrai o texto, autor, tags e link do autor
     for quote in soup.find_all("div", class_="quote"):
@@ -32,7 +43,10 @@ def extrair_citacoes(html):
             "texto": texto,
             "autor": autor,
             "tags": tags, 
-            "link_autor": link_autor
+            "link_autor": link_autor,
+            "coletado_em": coletado_em,
+            "url_origem": url_origem,
+            "hash_texto": gerar_hash_texto(texto)
         })
 
     return citacoes
