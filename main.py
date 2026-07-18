@@ -1,6 +1,8 @@
 from config import URL, DATABASE
-from scraper import  enriquecer_citacoes_com_autores, extrair_citacoes, obter_html, obter_proxima_pagina
+from scraper import enriquecer_citacoes_com_autores,extrair_citacoes,obter_html, obter_proxima_pagina
+
 from banco import criar_tabela, salvar_citacoes, salvar_csv
+from limpeza import deduplicar_citacoes
 
 
 def main():
@@ -17,6 +19,8 @@ def main():
         citacoes = extrair_citacoes(html, url_origem=url_atual)
         todas_as_citacoes.extend(citacoes)
         url_atual = obter_proxima_pagina(html)
+
+    todas_as_citacoes = deduplicar_citacoes(todas_as_citacoes)
 
     print("\n" + "=" * 60)
     print(f"Total de citações coletadas: {len(todas_as_citacoes)}")

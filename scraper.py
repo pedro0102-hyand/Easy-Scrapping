@@ -1,21 +1,15 @@
-import hashlib
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timezone
 from urllib.parse import urljoin
 from config import URL
+from limpeza import limpar_citacao, normalizar_texto
 
 def obter_html(url):
 
     response = requests.get(url, timeout=10) # acesso ao site com timeout de 10 segundos
     response.raise_for_status()
     return response.text
-
-
-def gerar_hash_texto(texto):
-
-    # Identificador estável da citação, útil para deduplicação e rastreio.
-    return hashlib.sha256(texto.encode("utf-8")).hexdigest()
 
 
 def extrair_citacoes(html, url_origem=None):
@@ -39,15 +33,15 @@ def extrair_citacoes(html, url_origem=None):
 
         link_autor = urljoin(URL, quote.find("a")["href"])
 
-        citacoes.append({
+        citacao = limpar_citacao({
             "texto": texto,
             "autor": autor,
             "tags": tags, 
             "link_autor": link_autor,
             "coletado_em": coletado_em,
             "url_origem": url_origem,
-            "hash_texto": gerar_hash_texto(texto)
         })
+        citacoes.append(citacao)
 
     return citacoes
 
@@ -68,9 +62,18 @@ def extrair_dados_autor(html):
 
     return {
 
-        "data_nascimento": data_nascimento.get_text(strip=True) if data_nascimento else None,
-        "local_nascimento": local,
-        "biografia": biografia.get_text(" ", strip=True) if biografia else None
+        "data_nascimento": normalizar_texto(
+            data_nascimento.get_text(strip=True),
+            remover_aspas_externas=False
+        ) if data_nascimento else None,
+        "local_nascimento": normalizar_texto(
+            local,
+            remover_aspas_externas=False
+        ),
+        "biografia": normalizar_texto(
+            biografia.get_text(" ", strip=True),
+            remover_aspas_externas=False
+        ) if biografia else None
         
     }
 

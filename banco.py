@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 from config import DATABASE, NOME_TABELA
+from limpeza import limpar_citacao, normalizar_tags
 
 def salvar_csv(citacoes, nome_arquivo="citacoes.csv"):
 
@@ -8,7 +9,7 @@ def salvar_csv(citacoes, nome_arquivo="citacoes.csv"):
     
     for citacao in citacoes:
 
-        copia = citacao.copy()
+        copia = limpar_citacao(citacao)
 
         if isinstance(copia["tags"], list):
 
@@ -29,6 +30,7 @@ def criar_tabela():
         CREATE TABLE IF NOT EXISTS {NOME_TABELA} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             texto TEXT NOT NULL,
+            texto_normalizado TEXT NOT NULL,
             autor TEXT NOT NULL,
             tags TEXT,
             link_autor TEXT,
@@ -45,6 +47,7 @@ def criar_tabela():
     cursor.execute(f"PRAGMA table_info({NOME_TABELA})")
     colunas_existentes = {coluna[1] for coluna in cursor.fetchall()}
     novas_colunas = {
+        "texto_normalizado": "TEXT",
         "data_nascimento": "TEXT",
         "local_nascimento": "TEXT",
         "biografia": "TEXT",
@@ -60,17 +63,47 @@ def criar_tabela():
                 f"ADD COLUMN {nome_coluna} {tipo_coluna}"
             )
 
-    # Remove duplicatas de execuções antigas, mantendo o registro mais
-    # recente (que contém os dados do autor), e garante unicidade.
+    # Migra também os registros já existentes para a forma normalizada.
+    cursor.execute("DROP INDEX IF EXISTS idx_citacao_unica")
+    cursor.execute("DROP INDEX IF EXISTS idx_hash_texto")
+    cursor.execute(
+        f"SELECT id, texto, autor, tags FROM {NOME_TABELA}"
+    )
+
+    for id_citacao, texto, autor, tags in cursor.fetchall():
+        citacao_limpa = limpar_citacao({
+            "texto": texto,
+            "autor": autor,
+            "tags": normalizar_tags(tags),
+        })
+        cursor.execute(f"""
+            UPDATE {NOME_TABELA}
+            SET texto = ?,
+                texto_normalizado = ?,
+                autor = ?,
+                tags = ?,
+                hash_texto = ?
+            WHERE id = ?
+        """, (
+            citacao_limpa["texto"],
+            citacao_limpa["texto_normalizado"],
+            citacao_limpa["autor"],
+            ", ".join(citacao_limpa["tags"]),
+            citacao_limpa["hash_texto"],
+            id_citacao,
+        ))
+
+    # O hash canônico identifica a mesma citação mesmo quando espaços,
+    # aspas ou capitalização são diferentes.
     cursor.execute(f"""
         DELETE FROM {NOME_TABELA}
         WHERE id NOT IN (
-            SELECT MAX(id) FROM {NOME_TABELA} GROUP BY texto, autor
+            SELECT MAX(id) FROM {NOME_TABELA} GROUP BY hash_texto
         )
     """)
     cursor.execute(f"""
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_citacao_unica
-        ON {NOME_TABELA} (texto, autor)
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_hash_texto
+        ON {NOME_TABELA} (hash_texto)
     """)
 
     conn.commit()
@@ -82,12 +115,14 @@ def salvar_citacoes(citacoes):
     cursor = conn.cursor()
 
     for citacao in citacoes:
+        citacao = limpar_citacao(citacao)
 
-        # Upsert: se a citação já existir, atualiza os campos em vez de
-        # duplicar a linha.
+        # Upsert pelo hash: variações de espaços, aspas e capitalização
+        # atualizam a mesma citação em vez de duplicá-la.
         cursor.execute(f"""
             INSERT INTO {NOME_TABELA} (
                 texto,
+                texto_normalizado,
                 autor,
                 tags,
                 link_autor,
@@ -98,8 +133,11 @@ def salvar_citacoes(citacoes):
                 url_origem,
                 hash_texto
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (texto, autor) DO UPDATE SET
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (hash_texto) DO UPDATE SET
+                texto = excluded.texto,
+                texto_normalizado = excluded.texto_normalizado,
+                autor = excluded.autor,
                 tags = excluded.tags,
                 link_autor = excluded.link_autor,
                 data_nascimento = excluded.data_nascimento,
@@ -110,6 +148,7 @@ def salvar_citacoes(citacoes):
                 hash_texto = excluded.hash_texto
         """, (
             citacao["texto"],
+            citacao["texto_normalizado"],
             citacao["autor"],
             ", ".join(citacao["tags"]) if isinstance(citacao["tags"], list) else citacao["tags"],
             citacao["link_autor"],
