@@ -1,5 +1,5 @@
 from config import URL, DATABASE
-from scraper import obter_html, extrair_citacoes, obter_proxima_pagina
+from scraper import  enriquecer_citacoes_com_autores, extrair_citacoes, obter_html, obter_proxima_pagina
 from banco import criar_tabela, salvar_citacoes, salvar_csv
 
 
@@ -22,13 +22,16 @@ def main():
     print(f"Total de citações coletadas: {len(todas_as_citacoes)}")
     print("=" * 60)
 
-    # 3. Salva no Banco de Dados e gera o CSV
+    # 3. Coleta os detalhes de cada autor uma única vez.
+    enriquecer_citacoes_com_autores(todas_as_citacoes)
+
+    # 4. Salva no Banco de Dados e gera o CSV
     salvar_citacoes(todas_as_citacoes)
     print(f"\nCitações salvas com sucesso no banco de dados '{DATABASE}'!")
     
     salvar_csv(todas_as_citacoes)
 
-    # 4. Exibe os dados formatados no terminal (comportamento do visualizador)
+    # 5. Exibe os dados formatados no terminal (comportamento do visualizador)
     for i, citacao in enumerate(todas_as_citacoes, start=1):
         print(f"\nCitação {i}")
         print(f"Texto : {citacao['texto']}")
@@ -37,6 +40,8 @@ def main():
         tags_str = ", ".join(citacao["tags"]) if isinstance(citacao["tags"], list) else citacao["tags"]
         print(f"Tags  : {tags_str}")
         print(f"Link  : {citacao['link_autor']}")
+        print(f"Nascimento: {citacao['data_nascimento']}")
+        print(f"Local: {citacao['local_nascimento']}")
 
 
 if __name__ == "__main__":
