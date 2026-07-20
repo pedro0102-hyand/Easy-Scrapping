@@ -40,27 +40,6 @@
         required
       ></textarea>
 
-      <div class="ask__controls">
-        <label class="field">
-          <span>Tipo</span>
-          <select id="tipo" name="tipo">
-            <option value="">Todos</option>
-            <option value="citacao">Citações</option>
-            <option value="biografia">Biografias</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Documentos (k)</span>
-          <input id="k" name="k" type="number" min="1" max="10" value="5" />
-        </label>
-
-        <label class="field field--grow">
-          <span>Autor (opcional)</span>
-          <input id="autor" name="autor" type="text" placeholder="Einstein" />
-        </label>
-      </div>
-
       <div class="ask__actions">
         <button type="submit" class="btn" id="btn-perguntar">
           <span class="btn__label">Perguntar</span>
@@ -76,12 +55,6 @@
         <div class="answer__body" id="resposta"></div>
       </article>
 
-      <aside class="sources">
-        <h2 class="result__title">Fontes recuperadas</h2>
-        <ol class="sources__list" id="fontes"></ol>
-      </aside>
-    </section>
-  </main>
 
   <script src="/static/app.js" defer></script>
 </body>
