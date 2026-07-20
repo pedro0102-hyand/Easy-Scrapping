@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quotes AI </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sora:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true">
+    <div class="atmosphere__wash"></div>
+    <div class="atmosphere__grain"></div>
+    <div class="atmosphere__orb atmosphere__orb--a"></div>
+    <div class="atmosphere__orb atmosphere__orb--b"></div>
+  </div>
+
+  <main class="shell">
+    <header class="hero">
+      <p class="brand">Vozes</p>
+      <h1 class="headline">Pergunte ao acervo</h1>
+      <p class="lede">
+        Citações e biografias respondidas com fontes do seu próprio scraping.
+      </p>
+    </header>
+
+    <form class="ask" id="ask-form" autocomplete="off">
+      <label class="ask__label" for="pergunta">Sua pergunta</label>
+      <textarea
+        id="pergunta"
+        name="pergunta"
+        rows="3"
+        maxlength="500"
+        placeholder="Ex.: Quem falou sobre coragem e amizade?"
+        required
+      ></textarea>
+
+      <div class="ask__controls">
+        <label class="field">
+          <span>Tipo</span>
+          <select id="tipo" name="tipo">
+            <option value="">Todos</option>
+            <option value="citacao">Citações</option>
+            <option value="biografia">Biografias</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Documentos (k)</span>
+          <input id="k" name="k" type="number" min="1" max="10" value="5" />
+        </label>
+
+        <label class="field field--grow">
+          <span>Autor (opcional)</span>
+          <input id="autor" name="autor" type="text" placeholder="Einstein" />
+        </label>
+      </div>
+
+      <div class="ask__actions">
+        <button type="submit" class="btn" id="btn-perguntar">
+          <span class="btn__label">Perguntar</span>
+          <span class="btn__spinner" aria-hidden="true"></span>
+        </button>
+        <p class="ask__hint" id="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <section class="result" id="resultado" hidden>
+      <article class="answer">
+        <h2 class="result__title">Resposta</h2>
+        <div class="answer__body" id="resposta"></div>
+      </article>
+
+      <aside class="sources">
+        <h2 class="result__title">Fontes recuperadas</h2>
+        <ol class="sources__list" id="fontes"></ol>
+      </aside>
+    </section>
+  </main>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
