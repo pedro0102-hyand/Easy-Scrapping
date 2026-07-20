@@ -1,13 +1,11 @@
 const form = document.getElementById("ask-form");
 const perguntaEl = document.getElementById("pergunta");
-const tipoEl = document.getElementById("tipo");
-const kEl = document.getElementById("k");
-const autorEl = document.getElementById("autor");
 const btn = document.getElementById("btn-perguntar");
 const statusEl = document.getElementById("status");
 const resultadoEl = document.getElementById("resultado");
 const respostaEl = document.getElementById("resposta");
-const fontesEl = document.getElementById("fontes");
+
+const K_PADRAO = 5;
 
 function setLoading(loading) {
   btn.disabled = loading;
@@ -28,49 +26,6 @@ function mostrarErro(mensagem) {
   form.insertAdjacentElement("afterend", erro);
 }
 
-function renderizarFontes(documentos) {
-  fontesEl.innerHTML = "";
-
-  if (!documentos || documentos.length === 0) {
-    const vazio = document.createElement("li");
-    vazio.textContent = "Nenhum documento recuperado.";
-    fontesEl.appendChild(vazio);
-    return;
-  }
-
-  documentos.forEach((doc, indice) => {
-    const meta = doc.metadados || {};
-    const item = document.createElement("li");
-    item.style.animationDelay = `${indice * 0.05}s`;
-
-    const cabecalho = document.createElement("div");
-    cabecalho.className = "source__meta";
-    cabecalho.innerHTML = `
-      <span>${meta.tipo_documento || "documento"}</span>
-      <span>score ${Number(doc.score || 0).toFixed(3)}</span>
-    `;
-
-    const autor = document.createElement("p");
-    autor.className = "source__autor";
-    autor.textContent = meta.autor || "Autor desconhecido";
-
-    item.appendChild(cabecalho);
-    item.appendChild(autor);
-
-    if (meta.url_origem) {
-      const link = document.createElement("a");
-      link.className = "source__link";
-      link.href = meta.url_origem;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = meta.url_origem;
-      item.appendChild(link);
-    }
-
-    fontesEl.appendChild(item);
-  });
-}
-
 async function enviarPergunta(event) {
   event.preventDefault();
   limparErro();
@@ -81,34 +36,42 @@ async function enviarPergunta(event) {
     return;
   }
 
-  const payload = {
-    pergunta,
-    k: Number(kEl.value) || 5,
-    tipo_documento: tipoEl.value || null,
-    autor: autorEl.value.trim() || null,
-  };
-
   setLoading(true);
   resultadoEl.hidden = true;
 
   try {
-    const resposta = await fetch("/api/perguntar", {
+    const respostaHttp = await fetch("/api/perguntar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        pergunta,
+        k: K_PADRAO,
+      }),
     });
 
-    const dados = await resposta.json();
+    const texto = await respostaHttp.text();
+    let dados;
 
-    if (!resposta.ok) {
+    try {
+      dados = JSON.parse(texto);
+    } catch {
+      throw new Error(
+        "A API não devolveu JSON. Confirme que o servidor está em http://127.0.0.1:5001"
+      );
+    }
+
+    if (!respostaHttp.ok) {
       throw new Error(dados.erro || "Falha ao consultar o RAG.");
     }
 
+    if (!dados.resposta) {
+      throw new Error("Resposta vazia do servidor.");
+    }
+
     respostaEl.textContent = dados.resposta;
-    renderizarFontes(dados.documentos);
     resultadoEl.hidden = false;
     resultadoEl.scrollIntoView({ behavior: "smooth", block: "start" });
-    statusEl.textContent = `${dados.documentos.length} documento(s) usados.`;
+    statusEl.textContent = "";
   } catch (erro) {
     mostrarErro(erro.message || "Erro inesperado.");
     statusEl.textContent = "";

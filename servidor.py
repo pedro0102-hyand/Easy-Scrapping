@@ -70,5 +70,5 @@ def api_perguntar():
 
 
 if __name__ == "__main__":
-    print("Quotes AI em http://127.0.0.1:5000")
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    print("Quotes AI em http://127.0.0.1:5001")
+    app.run(host="127.0.0.1", port=5001, debug=False)
