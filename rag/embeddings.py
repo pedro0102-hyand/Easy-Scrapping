@@ -1,5 +1,3 @@
-"""Geração de embeddings multilíngues para os documentos do RAG."""
-
 from functools import lru_cache
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -11,8 +9,6 @@ NOME_MODELO = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
 def carregar_modelo(nome_modelo=NOME_MODELO):
 
-    """Carrega o modelo uma única vez durante a execução."""
-
     try:
 
         return SentenceTransformer(nome_modelo, local_files_only=True)
@@ -23,8 +19,6 @@ def carregar_modelo(nome_modelo=NOME_MODELO):
 
 
 def gerar_embeddings(textos, modelo=None, mostrar_progresso=False):
-
-    """Converte textos em vetores normalizados para similaridade de cosseno."""
 
     if not textos:
 

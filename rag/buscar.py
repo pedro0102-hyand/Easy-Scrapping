@@ -1,11 +1,7 @@
-"""CLI de busca semântica: interface de linha de comando sobre o retriever."""
 import argparse
 from rag.retriever import TIPOS_DOCUMENTO, buscar
 
-
 def exibir_resultados(resultados):
-
-    """Exibe os resultados da busca de forma legível no terminal."""
 
     if not resultados:
 

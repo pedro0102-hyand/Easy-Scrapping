@@ -21,7 +21,6 @@ TRADUCAO_ASPAS = str.maketrans({
 
 
 def normalizar_espacos(valor):
-    """Remove espaços extras, quebras de linha e tabulações."""
 
     if valor is None:
         return None
@@ -30,7 +29,6 @@ def normalizar_espacos(valor):
 
 
 def normalizar_texto(texto, lowercase=False, remover_aspas_externas=True):
-    """Cria texto consistente sem destruir a capitalização por padrão."""
 
     if texto is None:
         return None
@@ -39,7 +37,9 @@ def normalizar_texto(texto, lowercase=False, remover_aspas_externas=True):
     texto = normalizar_espacos(texto)
 
     if remover_aspas_externas:
+
         while len(texto) >= 2 and (texto[0], texto[-1]) in PARES_DE_ASPAS:
+
             texto = normalizar_espacos(texto[1:-1])
 
     texto = texto.translate(TRADUCAO_ASPAS)
@@ -49,12 +49,14 @@ def normalizar_texto(texto, lowercase=False, remover_aspas_externas=True):
 
 
 def normalizar_tags(tags):
-    """Normaliza tags em minúsculas e remove repetições."""
+
 
     if not tags:
+
         return []
 
     if isinstance(tags, str):
+
         tags = tags.split(",")
 
     tags_normalizadas = []
@@ -70,14 +72,12 @@ def normalizar_tags(tags):
 
 
 def gerar_hash_texto(texto):
-    """Gera SHA-256 usando a versão canônica do texto."""
 
     texto_canonico = normalizar_texto(texto, lowercase=True)
     return hashlib.sha256(texto_canonico.encode("utf-8")).hexdigest()
 
 
 def limpar_citacao(citacao):
-    """Normaliza os campos de uma citação sem alterar o dicionário original."""
 
     citacao_limpa = citacao.copy()
     texto = normalizar_texto(citacao_limpa["texto"])
@@ -104,11 +104,11 @@ def limpar_citacao(citacao):
 
 
 def deduplicar_citacoes(citacoes):
-    """Remove duplicatas pelo hash e preserva a ordem da coleta."""
-
+ 
     citacoes_por_hash = {}
 
     for citacao in citacoes:
+        
         citacao_limpa = limpar_citacao(citacao)
         citacoes_por_hash[citacao_limpa["hash_texto"]] = citacao_limpa
 

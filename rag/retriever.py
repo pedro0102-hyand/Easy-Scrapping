@@ -1,21 +1,11 @@
-"""Camada de retriever: busca semântica reutilizável sobre o índice vetorial.
-
-Diferente de chamar `buscar` avulso, a classe `Retriever` carrega o índice,
-os documentos e o modelo de embeddings uma única vez e reaproveita tudo entre
-consultas. Isso evita reler o disco e recarregar o modelo a cada pergunta.
-"""
-
 from functools import lru_cache
-
 from rag.embeddings import carregar_modelo, gerar_embeddings
 from rag.indice import DIRETORIO_INDICE, carregar_indice
-
 
 TIPOS_DOCUMENTO = {"citacao", "biografia"}
 
 
 def _corresponde_filtros(documento, tipo_documento, autor, tag):
-    """Verifica se um documento satisfaz todos os filtros informados."""
 
     metadados = documento["metadados"]
 
@@ -41,8 +31,6 @@ def _corresponde_filtros(documento, tipo_documento, autor, tag):
 
 
 class Retriever:
-    
-    """Encapsula o índice vetorial e expõe uma API de busca com filtros."""
 
     def __init__(self, diretorio=DIRETORIO_INDICE):
         self.indice, self.documentos, self.manifesto = carregar_indice(diretorio)
@@ -57,7 +45,6 @@ class Retriever:
         tag=None,
         score_minimo=None,
     ):
-        """Retorna os `k` documentos mais próximos que satisfazem os filtros."""
 
         pergunta = (pergunta or "").strip()
         if not pergunta:
@@ -105,13 +92,12 @@ class Retriever:
 
 
 @lru_cache(maxsize=1)
+
 def _retriever_padrao(diretorio=DIRETORIO_INDICE):
-    """Reaproveita uma única instância de `Retriever` entre chamadas."""
 
     return Retriever(diretorio)
 
 
 def buscar(pergunta, k=5, diretorio=DIRETORIO_INDICE, **filtros):
-    """Atalho de módulo: usa um `Retriever` compartilhado (carregado uma vez)."""
 
     return _retriever_padrao(diretorio).buscar(pergunta, k=k, **filtros)

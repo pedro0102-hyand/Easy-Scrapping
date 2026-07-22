@@ -1,5 +1,3 @@
-"""Criação, persistência e carregamento do índice vetorial FAISS."""
-
 import hashlib
 import json
 from datetime import datetime, timezone
@@ -9,7 +7,6 @@ from config import DATABASE
 from rag.documentos import gerar_documentos
 from rag.embeddings import NOME_MODELO, gerar_embeddings
 
-
 DIRETORIO_INDICE = Path(__file__).parent / "store"
 ARQUIVO_INDICE = "indice.faiss"
 ARQUIVO_DOCUMENTOS = "documentos.json"
@@ -18,15 +15,11 @@ ARQUIVO_MANIFESTO = "manifesto.json"
 
 def calcular_assinatura(documentos):
 
-    """Identifica exatamente o conjunto e a ordem dos documentos indexados."""
-
     ids = "\n".join(documento["id"] for documento in documentos)
     return hashlib.sha256(ids.encode("utf-8")).hexdigest()
 
 
 def criar_indice(caminho_db=DATABASE, diretorio=DIRETORIO_INDICE):
-
-    """Gera embeddings e salva o índice, documentos e manifesto em disco."""
 
     documentos = gerar_documentos(caminho_db)
     textos = [documento["texto_indexacao"] for documento in documentos]
@@ -60,7 +53,6 @@ def criar_indice(caminho_db=DATABASE, diretorio=DIRETORIO_INDICE):
 
 
 def carregar_indice(diretorio=DIRETORIO_INDICE):
-    """Carrega o índice, seus documentos e o manifesto."""
 
     diretorio = Path(diretorio)
     caminhos = {

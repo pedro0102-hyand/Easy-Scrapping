@@ -1,11 +1,3 @@
-"""gera respostas com LLM a partir do contexto recuperado.
-
-Fluxo:
-1. Retriever busca os documentos mais próximos da pergunta.
-2. O contexto é montado e enviado ao Groq (Llama 3.3 70B).
-3. O modelo responde só com base nesse contexto, citando fontes.
-"""
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv

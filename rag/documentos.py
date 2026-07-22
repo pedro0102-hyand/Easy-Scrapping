@@ -1,14 +1,3 @@
-"""Transforma citações e biografias em documentos de indexação do RAG.
-
-Cada documento tem duas partes:
-- texto_indexacao: conteúdo que será convertido em embedding ;
-- metadados: campos estruturados devolvidos nas respostas do RAG
-  para garantir respostas auditáveis.
-
-As citações são indexadas inteiras. As biografias são documentos separados,
-divididos em chunks com sobreposição e gerados apenas uma vez por autor.
-"""
-
 import hashlib
 import sqlite3
 from config import DATABASE, NOME_TABELA
@@ -18,8 +7,6 @@ SOBREPOSICAO_CHUNK_BIOGRAFIA = 25
 
 
 def dividir_em_chunks(texto, tamanho = TAMANHO_CHUNK_BIOGRAFIA, sobreposicao = SOBREPOSICAO_CHUNK_BIOGRAFIA,):
-    
-    """Divide um texto por palavras, mantendo contexto entre chunks."""
 
     if not texto:
 
@@ -53,22 +40,20 @@ def dividir_em_chunks(texto, tamanho = TAMANHO_CHUNK_BIOGRAFIA, sobreposicao = S
 
 def carregar_citacoes(caminho_db=DATABASE):
 
-    """Lê todas as citações do SQLite como dicionários."""
-
     conn = sqlite3.connect(caminho_db)
     conn.row_factory = sqlite3.Row
 
     try:
+
         linhas = conn.execute(f"SELECT * FROM {NOME_TABELA}").fetchall()
     finally:
+
         conn.close()
 
     return [dict(linha) for linha in linhas]
 
 
 def montar_documento_citacao(citacao):
-
-    """Monta o documento de indexação de uma citação."""
 
     tags = citacao.get("tags") or ""
     if isinstance(tags, str):
@@ -107,8 +92,6 @@ def montar_documento_citacao(citacao):
 
 
 def montar_documentos_biografia(autor):
-
-    """Monta os documentos correspondentes aos chunks de uma biografia."""
 
     chunks = dividir_em_chunks(autor.get("biografia"))
     total_chunks = len(chunks)
@@ -155,8 +138,6 @@ def montar_documentos_biografia(autor):
 
 def selecionar_autores_unicos(citacoes):
 
-    """Seleciona uma biografia por autor, evitando chunks repetidos."""
-
     autores_por_chave = {}
 
     for citacao in citacoes:
@@ -169,14 +150,10 @@ def selecionar_autores_unicos(citacoes):
 
 def montar_documento(citacao):
 
-    """Mantém a interface anterior para documentos de citação."""
-
     return montar_documento_citacao(citacao)
 
 
 def gerar_documentos(caminho_db=DATABASE):
-
-    """Gera documentos de citações e chunks únicos de biografias."""
 
     citacoes = carregar_citacoes(caminho_db)
     documentos_citacoes = [

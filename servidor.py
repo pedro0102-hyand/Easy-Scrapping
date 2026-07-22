@@ -11,21 +11,27 @@ _retriever = None
 
 
 def obter_retriever():
-    """Carrega o retriever uma única vez (modelo + índice em memória)."""
 
     global _retriever
+
     if _retriever is None:
+
         _retriever = Retriever()
+
     return _retriever
 
 
 @app.get("/")
+
 def home():
+
     return send_from_directory(UI_DIR, "index.html")
 
 
 @app.post("/api/perguntar")
+
 def api_perguntar():
+
     dados = request.get_json(silent=True) or {}
     pergunta = (dados.get("pergunta") or "").strip()
 
@@ -48,6 +54,7 @@ def api_perguntar():
             autor=autor,
             retriever=obter_retriever(),
         )
+        
     except ValueError as erro:
         return jsonify({"erro": str(erro)}), 400
     except Exception as erro:  # noqa: BLE001 - devolve erro legível à UI

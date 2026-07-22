@@ -1,11 +1,11 @@
 from config import URL, DATABASE
 from scraper import enriquecer_citacoes_com_autores,extrair_citacoes,obter_html, obter_proxima_pagina
-
 from banco import criar_tabela, salvar_citacoes, salvar_csv
 from limpeza import deduplicar_citacoes
 
 
 def main():
+
     # 1. Inicializa o Banco de Dados
     criar_tabela()
 
@@ -49,4 +49,5 @@ def main():
 
 
 if __name__ == "__main__":
+    
     main()
