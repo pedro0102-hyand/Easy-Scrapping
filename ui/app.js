@@ -4,8 +4,35 @@ const btn = document.getElementById("btn-perguntar");
 const statusEl = document.getElementById("status");
 const resultadoEl = document.getElementById("resultado");
 const respostaEl = document.getElementById("resposta");
+const themeToggle = document.getElementById("theme-toggle");
 
 const K_PADRAO = 5;
+const THEME_KEY = "quotes-ai-theme";
+
+function temaAtual() {
+  return document.documentElement.getAttribute("data-theme") || "light";
+}
+
+function aplicarTema(tema) {
+  const proximo = tema === "dark" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", proximo);
+  localStorage.setItem(THEME_KEY, proximo);
+  if (themeToggle) {
+    themeToggle.setAttribute(
+      "aria-label",
+      proximo === "dark" ? "Ativar modo claro" : "Ativar modo escuro"
+    );
+  }
+}
+
+function alternarTema() {
+  aplicarTema(temaAtual() === "dark" ? "light" : "dark");
+}
+
+aplicarTema(temaAtual());
+if (themeToggle) {
+  themeToggle.addEventListener("click", alternarTema);
+}
 
 function setLoading(loading) {
   btn.disabled = loading;

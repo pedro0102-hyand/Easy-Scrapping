@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme="light"] {
   --ink: #12261f;
   --ink-soft: #2a463b;
   --mist: #dce8e1;
@@ -8,9 +9,57 @@
   --sun: #e3b23c;
   --line: rgba(18, 38, 31, 0.12);
   --shadow: 0 18px 50px rgba(18, 38, 31, 0.12);
+  --panel: rgba(255, 255, 255, 0.72);
+  --panel-strong: rgba(255, 255, 255, 0.9);
+  --input-border: rgba(18, 38, 31, 0.16);
+  --focus-ring: rgba(31, 107, 82, 0.16);
+  --btn-text: #f4fbf7;
+  --error-bg: rgba(140, 40, 40, 0.08);
+  --error-text: #7a2222;
+  --atmosphere: linear-gradient(160deg, #f4faf6 0%, #d9ebe3 42%, #c5ddd2 100%);
+  --wash-a: rgba(227, 178, 60, 0.28);
+  --wash-b: rgba(31, 107, 82, 0.18);
+  --wash-c: rgba(18, 38, 31, 0.12);
+  --orb-a: rgba(227, 178, 60, 0.35);
+  --orb-b: rgba(31, 107, 82, 0.28);
+  --grain-opacity: 0.18;
+  --grain-blend: multiply;
+  --toggle-bg: rgba(255, 255, 255, 0.7);
+  --toggle-border: rgba(18, 38, 31, 0.14);
   --radius: 18px;
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "Sora", sans-serif;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --ink: #e8f2ec;
+  --ink-soft: #a8c4b6;
+  --mist: #1a2e27;
+  --fog: #0d1713;
+  --leaf: #3d9a74;
+  --leaf-deep: #8fd4b2;
+  --sun: #e3b23c;
+  --line: rgba(232, 242, 236, 0.12);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  --panel: rgba(18, 32, 27, 0.78);
+  --panel-strong: rgba(22, 38, 32, 0.92);
+  --input-border: rgba(232, 242, 236, 0.14);
+  --focus-ring: rgba(61, 154, 116, 0.28);
+  --btn-text: #07140f;
+  --error-bg: rgba(255, 120, 120, 0.12);
+  --error-text: #ffb4b4;
+  --atmosphere: linear-gradient(160deg, #0b1410 0%, #12231c 48%, #183028 100%);
+  --wash-a: rgba(227, 178, 60, 0.14);
+  --wash-b: rgba(61, 154, 116, 0.16);
+  --wash-c: rgba(0, 0, 0, 0.28);
+  --orb-a: rgba(227, 178, 60, 0.18);
+  --orb-b: rgba(61, 154, 116, 0.2);
+  --grain-opacity: 0.12;
+  --grain-blend: soft-light;
+  --toggle-bg: rgba(22, 38, 32, 0.85);
+  --toggle-border: rgba(232, 242, 236, 0.14);
+  color-scheme: dark;
 }
 
 *,
@@ -30,6 +79,7 @@ body {
   color: var(--ink);
   background: var(--fog);
   line-height: 1.55;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
 .atmosphere {
@@ -37,17 +87,17 @@ body {
   inset: 0;
   z-index: -1;
   overflow: hidden;
-  background:
-    linear-gradient(160deg, #f4faf6 0%, #d9ebe3 42%, #c5ddd2 100%);
+  background: var(--atmosphere);
+  transition: background 0.45s ease;
 }
 
 .atmosphere__wash {
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(circle at 18% 20%, rgba(227, 178, 60, 0.28), transparent 34%),
-    radial-gradient(circle at 82% 12%, rgba(31, 107, 82, 0.18), transparent 30%),
-    radial-gradient(circle at 70% 78%, rgba(18, 38, 31, 0.12), transparent 36%);
+    radial-gradient(circle at 18% 20%, var(--wash-a), transparent 34%),
+    radial-gradient(circle at 82% 12%, var(--wash-b), transparent 30%),
+    radial-gradient(circle at 70% 78%, var(--wash-c), transparent 36%);
   animation: drift 18s ease-in-out infinite alternate;
 }
 
@@ -63,7 +113,7 @@ body {
   height: 280px;
   top: 12%;
   right: 8%;
-  background: rgba(227, 178, 60, 0.35);
+  background: var(--orb-a);
   animation: float-a 14s ease-in-out infinite;
 }
 
@@ -72,18 +122,78 @@ body {
   height: 360px;
   bottom: -8%;
   left: -4%;
-  background: rgba(31, 107, 82, 0.28);
+  background: var(--orb-b);
   animation: float-b 16s ease-in-out infinite;
 }
 
 .atmosphere__grain {
   position: absolute;
   inset: 0;
-  opacity: 0.18;
+  opacity: var(--grain-opacity);
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
   background-size: 180px 180px;
-  mix-blend-mode: multiply;
+  mix-blend-mode: var(--grain-blend);
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 1.1rem;
+  right: 1.1rem;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--toggle-border);
+  border-radius: 14px;
+  background: var(--toggle-bg);
+  color: var(--ink);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.theme-toggle__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+[data-theme="light"] .theme-toggle__icon--sun,
+[data-theme="dark"] .theme-toggle__icon--moon {
+  opacity: 0;
+  transform: rotate(-20deg) scale(0.7);
+  pointer-events: none;
+}
+
+[data-theme="light"] .theme-toggle__icon--moon,
+[data-theme="dark"] .theme-toggle__icon--sun {
+  opacity: 1;
+  transform: rotate(0) scale(1);
 }
 
 .shell {
@@ -128,10 +238,11 @@ body {
   padding: 1.25rem 1.25rem 1.15rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--panel);
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
   animation: rise 0.9s ease 0.08s both;
+  transition: background-color 0.35s ease, border-color 0.35s ease;
 }
 
 .ask__label {
@@ -148,12 +259,12 @@ textarea,
 select,
 input {
   width: 100%;
-  border: 1px solid rgba(18, 38, 31, 0.16);
+  border: 1px solid var(--input-border);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--panel-strong);
   color: var(--ink);
   font: inherit;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
 }
 
 textarea {
@@ -163,12 +274,17 @@ textarea {
   min-height: 96px;
 }
 
+textarea::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.75;
+}
+
 textarea:focus,
 select:focus,
 input:focus {
   outline: none;
   border-color: var(--leaf);
-  box-shadow: 0 0 0 3px rgba(31, 107, 82, 0.16);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .ask__controls {
@@ -216,7 +332,7 @@ input:focus {
   border: none;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--leaf) 0%, var(--leaf-deep) 100%);
-  color: #f4fbf7;
+  color: var(--btn-text);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -241,8 +357,8 @@ input:focus {
   position: absolute;
   width: 1.1rem;
   height: 1.1rem;
-  border: 2px solid rgba(244, 251, 247, 0.3);
-  border-top-color: #f4fbf7;
+  border: 2px solid color-mix(in srgb, var(--btn-text) 30%, transparent);
+  border-top-color: var(--btn-text);
   border-radius: 50%;
   opacity: 0;
 }
@@ -270,8 +386,9 @@ input:focus {
   padding: 1.2rem 1.25rem 1.3rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--panel);
   backdrop-filter: blur(8px);
+  transition: background-color 0.35s ease, border-color 0.35s ease;
 }
 
 .result__title {
@@ -301,7 +418,7 @@ input:focus {
   position: relative;
   padding: 0.85rem 0.95rem 0.9rem 2.6rem;
   border-left: 3px solid var(--sun);
-  background: rgba(238, 245, 240, 0.75);
+  background: color-mix(in srgb, var(--mist) 70%, transparent);
   border-radius: 0 12px 12px 0;
   counter-increment: fonte;
   animation: rise 0.45s ease both;
@@ -346,8 +463,8 @@ input:focus {
   margin-top: 1rem;
   padding: 0.9rem 1rem;
   border-radius: 12px;
-  background: rgba(140, 40, 40, 0.08);
-  color: #7a2222;
+  background: var(--error-bg);
+  color: var(--error-text);
   animation: rise 0.4s ease both;
 }
 
@@ -404,6 +521,11 @@ input:focus {
 
   .brand {
     font-size: clamp(2.8rem, 14vw, 4rem);
+  }
+
+  .theme-toggle {
+    top: 0.85rem;
+    right: 0.85rem;
   }
 }
 
