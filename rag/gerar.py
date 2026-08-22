@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from groq import Groq
 from rag.retriever import Retriever, buscar
 
-MODELO_GROQ = "llama-3.3-70b-versatile"
-TEMPERATURA = 0.5
+MODELO_GROQ = "openai/gpt-oss-20b"
+TEMPERATURA = 0.7
 
 PROMPT_SISTEMA = """Você é um assistente de perguntas e respostas sobre citações e biografias.
 
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Pergunta ao RAG (retriever + Groq Llama 3.3 70B)."
+        description="Pergunta ao RAG (retriever + Groq GPT-OSS 20B)."
     )
     parser.add_argument("pergunta", help="Pergunta em português ou inglês.")
     parser.add_argument("-k", type=int, default=5, help="Quantidade de documentos.")

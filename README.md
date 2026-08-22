@@ -2,7 +2,7 @@
 
 Projeto educacional de **web scraping**, limpeza de dados e **RAG** (Retrieval-Augmented Generation) sobre citações e biografias do site [quotes.toscrape.com](https://quotes.toscrape.com).
 
-O fluxo coleta citações e dados de autores, normaliza e persiste em SQLite/CSV, indexa semanticamente com embeddings + FAISS e responde perguntas em português com **Llama 3.3 70B** (Groq), citando fontes. A interface web **Quotes AI** consome essa API.
+O fluxo coleta citações e dados de autores, normaliza e persiste em SQLite/CSV, indexa semanticamente com embeddings + FAISS e responde perguntas em português com **GPT-OSS 20B** (Groq), citando fontes. A interface web **Quotes AI** consome essa API.
 
 ---
 
@@ -36,7 +36,7 @@ quotes.toscrape.com
   embeddings (MiniLM) + FAISS (rag/store/)
         │
         ▼
-  retriever (top-k) → Groq Llama 3.3 70B → resposta
+      retriever (top-k) → Groq GPT-OSS 20B → resposta
         │
         ▼
   Flask (servidor.py) + UI (ui/)
@@ -53,7 +53,7 @@ quotes.toscrape.com
 | Dados | `sqlite3`, `pandas` |
 | Embeddings | `sentence-transformers` (`paraphrase-multilingual-MiniLM-L12-v2`) |
 | Índice vetorial | `faiss-cpu` (`IndexFlatIP`) |
-| LLM | Groq API — `llama-3.3-70b-versatile` |
+| LLM | Groq API — `openai/gpt-oss-20b` |
 | API / UI | `flask`, HTML, CSS, JS |
 | Segredos | `.env` + `python-dotenv` |
 
@@ -168,7 +168,7 @@ Atalho no formulário: `Cmd+Enter` (Mac) ou `Ctrl+Enter` envia a pergunta.
 2. **Embeddings** — MiniLM multilíngue (12 camadas, vetor 384-d, normalizado).
 3. **Índice** — FAISS `IndexFlatIP`; com vetores normalizados, produto interno = **similaridade de cosseno**.
 4. **Retriever** — devolve os top-k trechos mais próximos da pergunta.
-5. **Geração** — Llama 3.3 70B (Groq) responde em português **somente** com base no contexto, listando fontes.
+5. **Geração** — GPT-OSS 20B (Groq) responde em português **somente** com base no contexto, listando fontes.
 
 ### Parâmetros principais
 
@@ -177,7 +177,7 @@ Atalho no formulário: `Cmd+Enter` (Mac) ou `Ctrl+Enter` envia a pergunta.
 | Embeddings | Modelo | `paraphrase-multilingual-MiniLM-L12-v2` |
 | Embeddings | Dimensões | 384 |
 | Chunk biografia | Tamanho / overlap | 120 / 25 palavras |
-| LLM | Modelo | `llama-3.3-70b-versatile` |
+| LLM | Modelo | `openai/gpt-oss-20b` |
 | LLM | Temperatura | `0.5` |
 | UI | `k` (docs no contexto) | `5` (fixo) |
 
@@ -205,7 +205,7 @@ Resposta inclui `resposta`, `documentos` e `fontes`.
 - **Unicode / NFKC** — padronizam caracteres equivalentes antes do hash e da indexação.
 - **Hash SHA-256** — identidade estável da citação (dedup + upsert + id do documento).
 - **Similaridade de cosseno** — quanto menor o ângulo entre vetores, maior o score (~0 a 1).
-- **Transformer** — MiniLM (local) gera embeddings; Llama (Groq) gera o texto da resposta.
+- **Transformer** — MiniLM (local) gera embeddings; GPT-OSS (Groq) gera o texto da resposta.
 
 ---
 
