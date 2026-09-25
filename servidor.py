@@ -4,32 +4,22 @@ from rag.gerar import perguntar
 from rag.retriever import Retriever
 
 UI_DIR = Path(__file__).resolve().parent / "ui"
-
 app = Flask(__name__, static_folder=str(UI_DIR), static_url_path="/static")
-
 _retriever = None
-
 
 def obter_retriever():
 
     global _retriever
-
     if _retriever is None:
-
         _retriever = Retriever()
-
     return _retriever
 
-
 @app.get("/")
-
 def home():
-
     return send_from_directory(UI_DIR, "index.html")
 
 
 @app.post("/api/perguntar")
-
 def api_perguntar():
 
     dados = request.get_json(silent=True) or {}
@@ -74,7 +64,6 @@ def api_perguntar():
             for doc in resultado["documentos"]
         ],
     })
-
 
 if __name__ == "__main__":
     print("Quotes AI em http://127.0.0.1:5001")
