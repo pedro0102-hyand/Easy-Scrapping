@@ -4,7 +4,6 @@ from rag.indice import DIRETORIO_INDICE, carregar_indice
 
 TIPOS_DOCUMENTO = {"citacao", "biografia"}
 
-
 def _corresponde_filtros(documento, tipo_documento, autor, tag):
 
     metadados = documento["metadados"]
@@ -66,7 +65,6 @@ class Retriever:
         # Com filtros, varremos todo o índice (pequeno) e filtramos depois.
         # Sem filtros, basta pedir os k melhores diretamente ao FAISS.
         quantidade_busca = self.indice.ntotal if tem_filtro else min(k, self.indice.ntotal)
-
         vetor_pergunta = gerar_embeddings([pergunta], modelo=self.modelo)
         scores, posicoes = self.indice.search(vetor_pergunta, quantidade_busca)
 
@@ -90,14 +88,10 @@ class Retriever:
 
         return resultados
 
-
 @lru_cache(maxsize=1)
 
 def _retriever_padrao(diretorio=DIRETORIO_INDICE):
-
     return Retriever(diretorio)
 
-
 def buscar(pergunta, k=5, diretorio=DIRETORIO_INDICE, **filtros):
-
     return _retriever_padrao(diretorio).buscar(pergunta, k=k, **filtros)

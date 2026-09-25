@@ -36,12 +36,9 @@ def carregar_chave_groq():
 
     return chave
 
-
 def montar_contexto(documentos):
 
-
     if not documentos:
-
         return "Nenhum documento relevante foi encontrado."
 
     blocos = []
@@ -59,7 +56,6 @@ def montar_contexto(documentos):
         )
 
     return "\n\n".join(blocos)
-
 
 def extrair_fontes(documentos):
 
@@ -125,7 +121,6 @@ def perguntar(
     pergunta = (pergunta or "").strip()
 
     if not pergunta:
-
         raise ValueError("A pergunta não pode estar vazia.")
 
     if retriever is None:

@@ -51,7 +51,6 @@ def criar_indice(caminho_db=DATABASE, diretorio=DIRETORIO_INDICE):
 
     return manifesto
 
-
 def carregar_indice(diretorio=DIRETORIO_INDICE):
 
     diretorio = Path(diretorio)
@@ -82,7 +81,6 @@ def carregar_indice(diretorio=DIRETORIO_INDICE):
         )
 
     return indice, documentos, manifesto
-
 
 if __name__ == "__main__":
     
