@@ -5,7 +5,7 @@ from groq import Groq
 from rag.retriever import Retriever, buscar
 
 MODELO_GROQ = "openai/gpt-oss-20b"
-TEMPERATURA = 0.7
+TEMPERATURA = 0.65
 
 PROMPT_SISTEMA = """Você é um assistente de perguntas e respostas sobre citações e biografias.
 
